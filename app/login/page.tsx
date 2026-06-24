@@ -65,12 +65,17 @@ export default function LoginPage() {
 
       let email = values.email;
       if (mode === 'student' && values.studentNumber) {
-        const { data, error } = await supabaseClient.from('profiles').select('email').eq('student_number', values.studentNumber).single();
-        if (error || !data) {
-          setMessage('Student number not found.');
+        const lookup = await fetch('/api/auth/student-lookup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ studentNumber: values.studentNumber })
+        });
+        const lookupResult = await lookup.json();
+        if (!lookup.ok || !lookupResult.email) {
+          setMessage(lookupResult.error ?? 'Student number not found.');
           return;
         }
-        email = data.email;
+        email = lookupResult.email;
       }
 
       const { error } = await supabaseClient.auth.signInWithPassword({ email: email || '', password: values.password ?? '' });
