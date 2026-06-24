@@ -2,6 +2,8 @@ import { Card } from '@/components/ui/card';
 import { supabaseServer } from '@/lib/supabaseServer';
 import type { Election } from '@/lib/types';
 
+export const dynamic = 'force-dynamic';
+
 type ElectionSummary = Pick<Election, 'id' | 'title' | 'status' | 'description' | 'start_time' | 'end_time'>;
 
 export default async function ResultsPage() {

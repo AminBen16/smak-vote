@@ -75,7 +75,7 @@ export async function POST(request: Request) {
   const result = await supabaseServer.rpc('cast_ballot', {
     p_student_id: userId,
     p_election_id: electionId,
-    p_votes: JSON.stringify(candidateRecords),
+    p_votes: candidateRecords,
     p_voting_token: votingToken || null
   });
 

@@ -16,9 +16,19 @@ export default function VotePage() {
   const [selected, setSelected] = useState<CandidateSelection[]>([]);
   const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
     async function load() {
+      const session = await supabaseClient.auth.getSession();
+      const sessionToken = session.data.session?.access_token ?? null;
+      const votingToken = window.localStorage.getItem('smak-voting-token');
+      if (!sessionToken && !votingToken) {
+        window.location.href = '/login';
+        return;
+      }
+      setAuthorized(true);
+
       const response = await fetch('/api/elections');
       const result = await response.json();
       if (response.ok) {
@@ -78,6 +88,17 @@ export default function VotePage() {
     const result = await response.json();
     setMessage(result.message ?? result.error ?? 'Unable to submit vote.');
     setSubmitting(false);
+  }
+
+  if (!authorized) {
+    return (
+      <section className="mx-auto max-w-3xl px-6 py-24 lg:px-8">
+        <Card>
+          <h1 className="text-2xl font-semibold text-slate-900">Checking access</h1>
+          <p className="mt-3 text-slate-600">Verifying your login…</p>
+        </Card>
+      </section>
+    );
   }
 
   if (!election) {

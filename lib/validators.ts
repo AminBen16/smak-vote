@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const loginSchema = z.object({
-  studentNumber: z.string().trim().min(3).optional(),
-  email: z.string().trim().email().optional(),
-  password: z.string().min(8).optional(),
+  studentNumber: z.string().trim().min(3).optional().or(z.literal('')),
+  email: z.string().trim().email().optional().or(z.literal('')),
+  password: z.string().min(8).optional().or(z.literal('')),
   token: z.string().trim().optional()
 }).superRefine((data, ctx) => {
   if (!data.token && !data.password) {

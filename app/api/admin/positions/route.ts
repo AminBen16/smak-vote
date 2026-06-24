@@ -2,7 +2,13 @@ import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { getUserProfileFromToken, unauthorizedResponse } from '@/lib/auth';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const token = request.headers.get('authorization')?.replace('Bearer ', '') || null;
+  const profile = await getUserProfileFromToken(token);
+  if (!profile || profile.role !== 'admin') {
+    return unauthorizedResponse();
+  }
+
   const { data, error } = await supabaseServer.from('positions').select('id, title, max_votes, election_id').order('title', { ascending: true });
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
