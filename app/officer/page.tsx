@@ -1,6 +1,8 @@
 import { Card } from '@/components/ui/card';
 import { supabaseServer } from '@/lib/supabaseServer';
 
+export const dynamic = 'force-dynamic';
+
 async function fetchOfficerStats() {
   const [pendingStudents, electedPositions] = await Promise.all([
     supabaseServer.from('profiles').select('id', { count: 'exact' }).neq('role', 'admin'),

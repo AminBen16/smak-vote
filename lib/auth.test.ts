@@ -60,14 +60,14 @@ describe('Auth Helpers', () => {
       vi.mocked(supabaseServer.auth.getUser).mockResolvedValueOnce({
         data: { user: null },
         error: new Error('User not found')
-      });
+      } as any);
 
       const profile = await getUserProfileFromToken('invalid-token');
       expect(profile).toBeNull();
     });
 
     it('should return null if profile not found', async () => {
-      const mockUser = { id: 'user-123', email: 'student@stmark.com' };
+      const mockUser = { id: 'user-123', email: 'student@stmark.com' } as any;
 
       vi.mocked(supabaseServer.auth.getUser).mockResolvedValueOnce({
         data: { user: mockUser },

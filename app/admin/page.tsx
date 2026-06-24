@@ -3,6 +3,8 @@ import { supabaseServer } from '@/lib/supabaseServer';
 import { AdminPanel } from '@/components/admin-panel';
 import type { Election } from '@/lib/types';
 
+export const dynamic = 'force-dynamic';
+
 type ElectionSummary = Pick<Election, 'id' | 'status'>;
 
 async function fetchAdminStats() {
