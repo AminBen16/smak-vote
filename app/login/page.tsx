@@ -78,14 +78,27 @@ export default function LoginPage() {
         email = lookupResult.email;
       }
 
-      const { error } = await supabaseClient.auth.signInWithPassword({ email: email || '', password: values.password ?? '' });
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email: email || '', password: values.password ?? '' });
       if (error) {
         setMessage(error.message);
         return;
       }
 
-      setMessage('Login successful. Redirecting to voting dashboard...');
-      window.location.href = '/vote';
+      setMessage('Login successful. Redirecting to your dashboard...');
+      const accessToken = data.session?.access_token;
+      let destination = '/vote';
+      if (accessToken) {
+        const me = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${accessToken}` } });
+        if (me.ok) {
+          const profile = await me.json();
+          if (profile.role === 'admin') {
+            destination = '/admin';
+          } else if (profile.role === 'officer') {
+            destination = '/officer';
+          }
+        }
+      }
+      window.location.href = destination;
     } catch (error) {
       setMessage('Unable to complete login.');
     }

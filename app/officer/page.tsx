@@ -1,18 +1,40 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { supabaseServer } from '@/lib/supabaseServer';
+import { GuardScreen } from '@/components/guard-screen';
+import { useAuthGuard } from '@/lib/use-auth-guard';
 
-export const dynamic = 'force-dynamic';
-
-async function fetchOfficerStats() {
-  const [pendingStudents, electedPositions] = await Promise.all([
-    supabaseServer.from('profiles').select('id', { count: 'exact' }).neq('role', 'admin'),
-    supabaseServer.from('positions').select('id', { count: 'exact' })
-  ]);
-  return { users: pendingStudents.count ?? 0, positions: electedPositions.count ?? 0 };
+interface OfficerStats {
+  users: number;
+  positions: number;
 }
 
-export default async function OfficerPage() {
-  const stats = await fetchOfficerStats();
+export default function OfficerPage() {
+  const { status, token } = useAuthGuard(['officer', 'admin']);
+  const [stats, setStats] = useState<OfficerStats>({ users: 0, positions: 0 });
+
+  useEffect(() => {
+    if (status !== 'authorized' || !token) {
+      return;
+    }
+    async function loadStats(authToken: string) {
+      const response = await fetch('/api/officer/stats', { headers: { Authorization: `Bearer ${authToken}` } });
+      if (response.ok) {
+        setStats(await response.json());
+      }
+    }
+    loadStats(token);
+  }, [status, token]);
+
+  if (status === 'loading') {
+    return <GuardScreen title="Checking access" message="Verifying your credentials…" />;
+  }
+
+  if (status === 'denied') {
+    return <GuardScreen title="Access denied" message="You must be signed in as an election officer to view this dashboard." />;
+  }
+
   return (
     <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8 space-y-8">
       <div>

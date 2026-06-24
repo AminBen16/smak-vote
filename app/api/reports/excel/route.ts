@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import * as XLSX from 'xlsx';
 import { supabaseServer } from '@/lib/supabaseServer';
+import { getUserProfileFromToken, unauthorizedResponse } from '@/lib/auth';
 
 interface ElectionRow {
   id: string;
@@ -18,7 +19,13 @@ interface TurnoutRow {
   turnout_percentage: number;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const token = request.headers.get('authorization')?.replace('Bearer ', '') || null;
+  const profile = await getUserProfileFromToken(token);
+  if (!profile || profile.role !== 'admin') {
+    return unauthorizedResponse();
+  }
+
   const [{ data: elections }, { data: turnout }] = await Promise.all([
     supabaseServer.from('elections').select('id, title, status, start_time, end_time, created_at'),
     supabaseServer.rpc('election_turnout_report')
