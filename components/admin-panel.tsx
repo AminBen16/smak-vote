@@ -290,14 +290,14 @@ export function AdminPanel() {
           </div>
           <div>
             <Label htmlFor="student_number">Student Number</Label>
-            <Input id="student_number" value={tokenForm.student_number} onChange={(e) => setTokenForm({ ...tokenForm, student_number: e.target.value })} placeholder="Optional" />
+            <Input id="student_number" value={tokenForm.student_number} onChange={(e) => setTokenForm({ ...tokenForm, student_number: e.target.value })} placeholder="Student number (or use email)" />
           </div>
           <div>
             <Label htmlFor="token_email">Email</Label>
-            <Input id="token_email" value={tokenForm.email} onChange={(e) => setTokenForm({ ...tokenForm, email: e.target.value })} placeholder="Optional" />
+            <Input id="token_email" value={tokenForm.email} onChange={(e) => setTokenForm({ ...tokenForm, email: e.target.value })} placeholder="Email (or use student number)" />
           </div>
           <div>
-            <Label htmlFor="expires_at">Expires at</Label>
+            <Label htmlFor="expires_at">Expires at (defaults to election end)</Label>
             <Input id="expires_at" type="datetime-local" value={tokenForm.expires_at} onChange={(e) => setTokenForm({ ...tokenForm, expires_at: e.target.value })} />
           </div>
           <Button type="submit" disabled={isLoading}>Create Voting Token</Button>
